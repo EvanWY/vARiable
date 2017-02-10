@@ -13,6 +13,8 @@ public class TouchInputStates : MonoBehaviour {
 	    
 	}
 
+    int singleTapCounter = 0;
+
     void Update()
     {
         if (Input.touchCount == 2)
@@ -29,25 +31,44 @@ public class TouchInputStates : MonoBehaviour {
             float scale = currDiff / prevDiff;
 
             InteractObject.GetComponent<ObjectAction>().DrivenScaling(scale);
+
+            singleTapCounter = 0;
         }
         else if (Input.GetMouseButton(0))
         {
-            old_mouse_pos = mouse_pos;
-            mouse_pos = Input.mousePosition;
-            if (Input.GetMouseButton(0))
-            {
-                if (old_mouse_pos != mouse_pos)
-                {
-                    mouse_velocity = (mouse_pos - old_mouse_pos) / Time.fixedDeltaTime;
-                    InteractObject.GetComponent<ObjectAction>().DrivenRotating(mouse_velocity);
-                }
-            }
-            //Debug.Log(mouse_velocity.magnitude);
-            if (!(Input.GetMouseButton(0)))
+            singleTapCounter++;
+
+            if (singleTapCounter >= 10)
             {
                 old_mouse_pos = mouse_pos;
-
+                mouse_pos = Input.mousePosition;
+                if (Input.GetMouseButton(0))
+                {
+                    if (old_mouse_pos != mouse_pos)
+                    {
+                        mouse_velocity = (mouse_pos - old_mouse_pos) / Time.fixedDeltaTime;
+                        InteractObject.GetComponent<ObjectAction>().DrivenRotating(mouse_velocity);
+                    }
+                }
             }
+            else
+            {
+                mouse_pos = Input.mousePosition;
+            }
+            
+        }
+        else
+        {
+            if (10 > singleTapCounter && singleTapCounter > 0)
+            {
+                RaycastHit hit;
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                if (Physics.Raycast(ray, out hit, 100f))
+                {
+                    hit.collider.SendMessageUpwards("OnSingleTap", hit.collider.name);
+                }
+            }
+            singleTapCounter = 0;
         }
     }
 }
