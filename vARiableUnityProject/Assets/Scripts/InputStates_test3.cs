@@ -54,6 +54,8 @@ public class InputStates_test3 : MonoBehaviour {
     float local_timer;
     Vector3 tap_down_position;
     Vector3 tap_down_position_2;
+    
+    GameObject ObjectTapAndHold;
     //Vector3 
     // Use this for initialization
     void Start()
@@ -146,6 +148,7 @@ public class InputStates_test3 : MonoBehaviour {
 
 
             case STATE.state_gesture_tapAndHold:
+
                 if (Input.GetMouseButtonUp(0))
                 {
                     state_trans(STATE.empty_state);
@@ -154,9 +157,23 @@ public class InputStates_test3 : MonoBehaviour {
 
 
             case STATE.state_gesture_tapHoldAndDrag:
-                if (Input.GetMouseButtonUp(0))
                 {
-                    state_trans(STATE.empty_state);
+                    old_mouse_pos = mouse_pos;
+                    mouse_pos = Input.mousePosition;
+                    if (Input.GetMouseButton(0))
+                    {
+                        if (old_mouse_pos != mouse_pos)
+                        {
+                            mouse_velocity = (mouse_pos - old_mouse_pos) / Time.fixedDeltaTime;
+                            ObjectTapAndHold.SendMessageUpwards("OnTapHoldAndDrag", mouse_velocity);
+                        }
+                    }
+                    if (Input.GetMouseButtonUp(0))
+                    {
+                        ObjectTapAndHold.SendMessageUpwards("OnTapHoldAndDragEnd");
+                        ObjectTapAndHold = null;
+                        state_trans(STATE.empty_state);
+                    }
                 }
                 break;
 
@@ -247,6 +264,14 @@ public class InputStates_test3 : MonoBehaviour {
                 }
                 else if ((Input.mousePosition - tap_down_position).magnitude > shortest_drag_distance)
                 {
+                    RaycastHit hit;
+                    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                    if (Physics.Raycast(ray, out hit, 100f))
+                    {
+                        hit.collider.SendMessageUpwards("OnTapAndHold", hit.collider.name);
+                        ObjectTapAndHold = hit.collider.gameObject;
+                    }
+
                     state_trans(STATE.state_gesture_tapHoldAndDrag);
                 }
                 break;
