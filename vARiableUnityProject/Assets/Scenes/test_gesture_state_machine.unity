@@ -114,7 +114,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gap_time: 0.5
-  longest_single_tap_time: 1
+  longest_single_tap_time: 0.2
   shortest_drag_distance: 50
 --- !u!4 &136991833
 Transform:
@@ -140,7 +140,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gap_time: 0.5
-  longest_single_tap_time: 0.2
+  longest_single_tap_time: 1
   shortest_drag_distance: 50
 --- !u!1 &253492011
 GameObject:
