@@ -15,5 +15,6 @@ public class GestureOpenBuckleOnSuitCase : MonoBehaviour {
     void OnSingleTap(string name)
     {
         GetComponent<Animator>().SetInteger("isTagged", 1);
+        this.transform.parent.GetComponent<GestureDragSuitCaseCover>().can_open++;
     }
 }
